@@ -349,7 +349,7 @@ def stashBinaries(os, edition) {
 
 def unstashBinaries(os, edition) {
     if (os == "windows") {
-        powershell "scp c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip stash.zip"
+        powershell "echo 'y' | pscp -i C:\\Users\\Jenkins\\.ssh\\putty-jenkins.ppk jenkins@c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip stash.zip"
         powershell "Expand-Archive -Path stash.zip -Force -DestinationPath ."
     } else {
         sh "scp c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.tar.gz stash.tar.gz"
