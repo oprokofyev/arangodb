@@ -326,11 +326,32 @@ Restrictions: ${restrictions.keySet().join(", ")}
 // -----------------------------------------------------------------------------
 
 def stashBinaries(os, edition) {
-    stash name: "binaries-${os}-${edition}", includes: "build/bin/**, build/tests/**, build/etc/**, etc/**, Installation/Pipeline/**, js/**, scripts/**, UnitTests/**, utils/**, resilience/**, enterprise/js/**", excludes: "build/bin/*.exe, build/bin/*.pdb, build/bin/*.ilk, build/tests/*.exe, build/tests/*.pdb, build/tests/*.ilk, js/node/node_modules/eslint*"
+    def scpCommand = "scp stash.zip c1:/vol/cache/binaries-${os}-${edition}.zip"
+    def paths = ["build/etc", "etc", "Installation/Pipeline", "js", "scripts", "UnitTests"]
+    if (os == "windows") {
+        paths << "build/bin/RelWithDebInfo"
+        paths << "build/tests/RelWithDebInfo"
+
+        powershell "Compress-Archive -Force -Path (Get-ChildItem -Recurse -Path " + windowsPaths.join(',') + " -DestinationPath stash.zip -Confirm -CompressionLevel Fastest"
+        powershell scpCommand
+    } else {
+        paths << "build/bin/"
+        paths << "build/tests/"
+
+        sh "zip stash.zip -r " + paths.join(" ")
+        sh scpCommand
+    }
 }
 
 def unstashBinaries(os, edition) {
-    unstash name: "binaries-${os}-${edition}"
+    def scpCommand = "scp c1:/vol/cache/binaries-${os}-${edition}.zip stash.zip"
+    if (os == "windows") {
+        powershell scpCommand
+        powershell "Expand-Archive -Path stash.zip -Force -DestinationPath ."
+    } else {
+        sh scpCommand
+        sh "unzip stash.zip"
+    }
 }
 
 // -----------------------------------------------------------------------------
