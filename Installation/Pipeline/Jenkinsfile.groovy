@@ -333,6 +333,7 @@ def stashBinaries(os, edition) {
 
         // so frustrating...compress-archive is built in but it simply won't include the relative path to the archive :(
         // powershell "Compress-Archive -Force -Path (Get-ChildItem -Recurse -Path " + paths.join(',') + ") -DestinationPath stash.zip -Confirm -CompressionLevel Fastest"
+        // install 7z portable (https://chocolatey.org/packages/7zip.portable)
         powershell "7z a .\stash.zip -r -bd -mx=1 " + paths.join(" ")
         powershell "scp stash.zip c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip"
     } else {
