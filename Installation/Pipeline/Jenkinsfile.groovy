@@ -335,7 +335,9 @@ def stashBinaries(os, edition) {
         // powershell "Compress-Archive -Force -Path (Get-ChildItem -Recurse -Path " + paths.join(',') + ") -DestinationPath stash.zip -Confirm -CompressionLevel Fastest"
         // install 7z portable (https://chocolatey.org/packages/7zip.portable)
         powershell "7z a stash.zip -r -bd -mx=1 " + paths.join(" ")
-        powershell "scp stash.zip c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip"
+        // this is a super mega mess...scp will run as the system user and not as jenkins when run as a server
+        // I couldn't figure out how to properly get it running for hours...so last resort was to install putty
+        powershell "echo 'y' | pscp -i C:\Users\Jenkins\.ssh\putty-jenkins.ppk stash.zip c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip"
     } else {
         paths << "build/bin/"
         paths << "build/tests/"
