@@ -326,7 +326,7 @@ Restrictions: ${restrictions.keySet().join(", ")}
 // -----------------------------------------------------------------------------
 
 def stashBinaries(os, edition) {
-    def scpCommand = "scp stash.zip c1:/vol/cache/binaries-${os}-${edition}.zip"
+    def scpCommand = "scp stash.zip c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip"
     def paths = ["build/etc", "etc", "Installation/Pipeline", "js", "scripts", "UnitTests"]
     if (os == "windows") {
         paths << "build/bin/RelWithDebInfo"
@@ -344,7 +344,7 @@ def stashBinaries(os, edition) {
 }
 
 def unstashBinaries(os, edition) {
-    def scpCommand = "scp c1:/vol/cache/binaries-${os}-${edition}.zip stash.zip"
+    def scpCommand = "scp c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip stash.zip"
     if (os == "windows") {
         powershell scpCommand
         powershell "Expand-Archive -Path stash.zip -Force -DestinationPath ."
