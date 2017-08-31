@@ -326,31 +326,29 @@ Restrictions: ${restrictions.keySet().join(", ")}
 // -----------------------------------------------------------------------------
 
 def stashBinaries(os, edition) {
-    def scpCommand = "scp stash.zip c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip"
     def paths = ["build/etc", "etc", "Installation/Pipeline", "js", "scripts", "UnitTests"]
     if (os == "windows") {
         paths << "build/bin/RelWithDebInfo"
         paths << "build/tests/RelWithDebInfo"
 
-        powershell "Compress-Archive -Force -Path (Get-ChildItem -Recurse -Path " + windowsPaths.join(',') + " -DestinationPath stash.zip -Confirm -CompressionLevel Fastest"
-        powershell scpCommand
+        powershell "Compress-Archive -Force -Path (Get-ChildItem -Recurse -Path " + paths.join(',') + " -DestinationPath stash.zip -Confirm -CompressionLevel Fastest"
+        powershell "scp stash.zip c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip"
     } else {
         paths << "build/bin/"
         paths << "build/tests/"
 
-        sh "zip stash.zip --symlinks -1 -r " + paths.join(" ")
-        sh scpCommand
+        sh "GZIP=-1 tar cpzf stash.tar.gz " + paths.join(" ")
+        sh "scp stash.tar.gz c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.tar.gz"
     }
 }
 
 def unstashBinaries(os, edition) {
-    def scpCommand = "scp c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip stash.zip"
     if (os == "windows") {
-        powershell scpCommand
+        powershell "scp c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip stash.zip"
         powershell "Expand-Archive -Path stash.zip -Force -DestinationPath ."
     } else {
-        sh scpCommand
-        sh "unzip stash.zip"
+        sh "scp c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.tar.gz stash.tar.gz"
+        sh "tar xpzf stash.tar.gz"
     }
 }
 
