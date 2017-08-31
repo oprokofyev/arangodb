@@ -338,7 +338,7 @@ def stashBinaries(os, edition) {
         paths << "build/bin/"
         paths << "build/tests/"
 
-        sh "zip stash.zip -1 -r " + paths.join(" ")
+        sh "zip stash.zip --symlinks -1 -r " + paths.join(" ")
         sh scpCommand
     }
 }
