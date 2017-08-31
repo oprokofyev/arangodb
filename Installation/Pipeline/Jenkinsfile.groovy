@@ -833,12 +833,6 @@ def runEdition(os, edition) {
                             jslint()
                         }
                     }
-                    fileOperations([folderDeleteOperation('js/node/node_modules')])
-                    if (os == "windows") {
-                        powershell "mv js/node/node_modules-bundled js/node/node_modules"
-                    } else {
-                        sh "mv js/node/node_modules-bundled js/node/node_modules"
-                    }
                     stashBinaries(os, edition)
                 }
 
