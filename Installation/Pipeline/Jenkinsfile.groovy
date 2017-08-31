@@ -567,19 +567,18 @@ def testStep(os, edition, mode, engine) {
             def buildName = "${os}-${edition}"
             def name = "${os}-${edition}-${mode}-${engine}"
             stage("test-${name}") {
-                // seriously...60 minutes is the super absolute max max max.
-                // even in the worst situations ArangoDB MUST be able to finish within 60 minutes
-                // even if the features are green this is completely broken performance wise..
-                // DO NOT INCREASE!!
-                def port = 0
+                fileOperations([folderDeleteOperation('tmp'), folderDeleteOperation('build/bin'), folderDeleteOperation('js'), folderDeleteOperation('out'), folderCreateOperation('tmp'),  fileDeleteOperation(excludes: '', includes: 'core.*,*.dmp')])
                 unstashBinaries(os, edition)
+                def port = 0
                 port = getStartPort(os) as Integer
                 echo "Using start port: ${port}"
                 if (os == "windows") {
                     powershell "copy build\\bin\\RelWithDebInfo\\* build\\bin"
                 }
-
-                fileOperations([folderDeleteOperation('tmp'), folderDeleteOperation('out'), folderCreateOperation('tmp'),  fileDeleteOperation(excludes: '', includes: 'core.*,*.dmp')])
+                // seriously...60 minutes is the super absolute max max max.
+                // even in the worst situations ArangoDB MUST be able to finish within 60 minutes
+                // even if the features are green this is completely broken performance wise..
+                // DO NOT INCREASE!!
                 timeout(60) {
                     try {
                         executeTests(os, edition, mode, engine, port)
