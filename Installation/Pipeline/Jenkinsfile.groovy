@@ -499,7 +499,6 @@ def executeTests(os, edition, mode, engine, port) {
                         if (os == "windows") {
                             powershell command
                         } else {
-                            sh "env"
                             sh command
                         }
                     }
