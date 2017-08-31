@@ -331,7 +331,7 @@ def stashBinaries(os, edition) {
         paths << "build/bin/RelWithDebInfo"
         paths << "build/tests/RelWithDebInfo"
 
-        powershell "Compress-Archive -Force -Path (Get-ChildItem -Recurse -Path " + paths.join(',') + " -DestinationPath stash.zip -Confirm -CompressionLevel Fastest"
+        powershell "Compress-Archive -Force -Path (Get-ChildItem -Recurse -Path " + paths.join(',') + ") -DestinationPath stash.zip -Confirm -CompressionLevel Fastest"
         powershell "scp stash.zip c1:/vol/cache/binaries-${env.BUILD_TAG}-${os}-${edition}.zip"
     } else {
         paths << "build/bin/"
