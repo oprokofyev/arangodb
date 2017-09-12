@@ -250,7 +250,7 @@ def checkCoresAndSave(os, runDir, name, archRun) {
     else {
         sh "for i in logs out tmp result; do test -e \"${runDir}/\$i\" && mv \"${runDir}/\$i\" \"${archRun}/${name}.\$i\" || true; done"
 
-        def files = findFiles(glob: '${runDir}/core*')
+        def files = findFiles(glob: "${runDir}/core*")
 
         if (files.length > 0) {
             for (file in files) {
@@ -458,6 +458,7 @@ CHANGE_ID: ${env.CHANGE_ID}
 CHANGE_TARGET: ${env.CHANGE_TARGET}
 JOB_NAME: ${env.JOB_NAME}
 CAUSE: ${causeDescription}
+
 """
 
     if (restrictions) {
@@ -552,8 +553,7 @@ def jslint(os, edition, maintainer) {
     def archFail = "${archDir}/02-jslint-FAIL"
 
     fileOperations([
-        folderDeleteOperation(arch),
-        folderDeleteOperation(archFail),
+        folderDeleteOperation(archDir),
         folderCreateOperation(arch)
     ])
 
@@ -799,6 +799,8 @@ def testStep(os, edition, maintainer, mode, engine, stageName) {
 
                     // create directories for the artifacts
                     fileOperations([
+                        folderDeleteOperation(arch),
+                        fileDeleteOperation(excludes: '', includes: "${archDir}-*"),
                         folderCreateOperation(arch),
                         folderCreateOperation(archFail),
                         folderCreateOperation(archRun)
@@ -1003,20 +1005,22 @@ def buildEdition(os, edition, maintainer) {
             }
         }
         else if (os == 'windows') {
-            def tmpDir = "${arch}/tmp"
-
-            fileOperations([
-                folderCreateOperation(tmpDir)
-            ])
-
+            // def tmpDir = "${arch}/tmp"
+            //
+            // fileOperations([
+            //     folderCreateOperation(tmpDir)
+            // ])
+            //
             // withEnv(["TMPDIR=${tmpDir}", "TEMPDIR=${tmpDir}", "TMP=${tmpDir}",
             //          "_MSPDBSRV_ENDPOINT_=${edition}-${env.BUILD_TAG}", "GYP_USE_SEPARATE_MSPDBSRV=1"]) {
-                powershell ". .\\Installation\\Pipeline\\windows\\build_${os}_${edition}.ps1"
+            //    powershell ". .\\Installation\\Pipeline\\windows\\build_${os}_${edition}.ps1"
             // }
+            //
+            // fileOperations([
+            //     folderDeleteOperation(tmpDir)
+            // ])
 
-            fileOperations([
-                folderDeleteOperation(tmpDir)
-            ])
+            powershell ". .\\Installation\\Pipeline\\windows\\build_${os}_${edition}.ps1"
         }
     }
     catch (exc) {
