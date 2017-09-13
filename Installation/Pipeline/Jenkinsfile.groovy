@@ -554,6 +554,7 @@ def jslint(os, edition, maintainer) {
 
     fileOperations([
         folderDeleteOperation(archDir),
+        fileDeleteOperation(excludes: '', includes: "${archDir}-*"),
         folderCreateOperation(arch)
     ])
 
@@ -565,7 +566,7 @@ def jslint(os, edition, maintainer) {
     }
     catch (exc) {
         renameFolder(arch, archFail)
-        fileOperations([fileCreateOperation(fileContent: 'BUILD FAILED', fileName: "${arch}-FAIL.txt")])
+        fileOperations([fileCreateOperation(fileContent: 'JSLINT FAILED', fileName: "${archDir}-FAIL.txt")])
         throw exc
     }
     finally {
