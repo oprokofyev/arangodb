@@ -168,7 +168,9 @@ function performTests (options, testList, testname, runFn, serverOptions, startS
 
       let collectionsBefore = [];
       db._collections().forEach(collection => {
-        collectionsBefore.push(collection._name);
+        if (collection._name[0] !== '_') {
+          collectionsBefore.push(collection._name);
+        }
       });
       while (first || options.loopEternal) {
         if (!continueTesting) {
@@ -217,18 +219,21 @@ function performTests (options, testList, testname, runFn, serverOptions, startS
         // Check whether some collections were left behind, and if mark test as failed.
         let collectionsAfter = [];
         db._collections().forEach(collection => {
-          collectionsAfter.push(collection._name);
+          if (collection._name[0] !== '_') {
+            collectionsAfter.push(collection._name);
+          }
         });
         let delta = diffArray(collectionsBefore, collectionsAfter);
-	print(delta);
-        if ((delta.length !== 0) && (! _.isEqual(delta, ['_foxxlog']))) {
+        if (delta.length !== 0) {
           results[te] = {
             status: false,
             message: 'Cleanup missing - test left over collections! [' + delta + '] - Original test status: ' + JSON.stringify(results[te])
           };
           collectionsBefore = [];
           db._collections().forEach(collection => {
-            collectionsBefore.push(collection._name);
+            if (collection._name[0] !== '_') {
+              collectionsBefore.push(collection._name);
+            }
           });
         }
 
@@ -244,7 +249,9 @@ function performTests (options, testList, testname, runFn, serverOptions, startS
           }
           collectionsBefore = [];
           db._collections().forEach(collection => {
-            collectionsBefore.push(collection._name);
+            if (collection._name[0] !== '_') {
+              collectionsBefore.push(collection._name);
+            }
           });
         }
 
